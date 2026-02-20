@@ -441,9 +441,40 @@
       <span id="statusText">INITIALIZING</span>
     </div>
     <button class="refresh-btn" id="refreshBtn" onclick="fetchData()">↻ REFRESH</button>
+    <button class="refresh-btn" onclick="toggleDebug()" style="border-color:#ff6b35;color:#ff6b35;">⚙ DEBUG</button>
     <span class="update-time" id="updateTime">—</span>
   </div>
 </header>
+
+<!-- DEBUG PANEL -->
+<div id="debugPanel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);z-index:9999;overflow-y:auto;padding:30px;font-family:Share Tech Mono,monospace;">
+  <div style="max-width:800px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <span style="font-family:Orbitron,sans-serif;color:#ff6b35;font-size:1rem;letter-spacing:0.2em;">⚙ DEBUG PANEL</span>
+      <button onclick="toggleDebug()" style="background:transparent;border:1px solid #ff6b35;color:#ff6b35;padding:6px 14px;cursor:pointer;font-family:Share Tech Mono,monospace;">✕ CLOSE</button>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="color:#4a7a8a;font-size:0.65rem;letter-spacing:0.2em;margin-bottom:8px;">SERVER STATUS</div>
+      <div id="debugServer" style="background:#0a1520;border:1px solid #0f3a52;padding:14px;border-radius:4px;white-space:pre;color:#c8e8f0;font-size:0.72rem;line-height:1.6;">Loading…</div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="color:#4a7a8a;font-size:0.65rem;letter-spacing:0.2em;margin-bottom:8px;">OPENSKY RAW RESPONSE</div>
+      <div id="debugOpensky" style="background:#0a1520;border:1px solid #0f3a52;padding:14px;border-radius:4px;white-space:pre-wrap;color:#c8e8f0;font-size:0.68rem;line-height:1.6;max-height:300px;overflow-y:auto;">Loading…</div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="color:#4a7a8a;font-size:0.65rem;letter-spacing:0.2em;margin-bottom:8px;">LAST ERROR</div>
+      <div id="debugError" style="background:#0a1520;border:1px solid #0f3a52;padding:14px;border-radius:4px;white-space:pre-wrap;color:#ff6b35;font-size:0.72rem;line-height:1.6;">None</div>
+    </div>
+
+    <div>
+      <div style="color:#4a7a8a;font-size:0.65rem;letter-spacing:0.2em;margin-bottom:8px;">BBOX / CONFIG</div>
+      <div id="debugConfig" style="background:#0a1520;border:1px solid #0f3a52;padding:14px;border-radius:4px;white-space:pre;color:#c8e8f0;font-size:0.72rem;line-height:1.6;"></div>
+    </div>
+  </div>
+</div>
 
 <div class="main-grid">
 
@@ -661,6 +692,7 @@ async function fetchData() {
     corsError = true;
     dot.className = 'status-dot error';
     txt.textContent = 'ERROR';
+    window._lastError = e.message + '\n' + new Date().toISOString();
     showError(e.message);
   }
 
@@ -753,17 +785,9 @@ function updateUI() {
 
 function showError(msg) {
   document.getElementById('aircraftList').innerHTML = `
-    <div class="empty-state">Failed to fetch data.</div>
+    <div class="empty-state" style="color:#ff6b35;">⚠ ${msg}</div>
     <div class="cors-notice">
-      <strong>⚠ Network Error:</strong> ${msg}<br><br>
-      The OpenSky Network API may block browser requests due to CORS restrictions on some endpoints.
-      <br><br>
-      <strong>Solutions:</strong><br>
-      1. Install a CORS browser extension temporarily<br>
-      2. Run a local proxy: <code>npx cors-anywhere</code><br>
-      3. Use the <a href="https://opensky-network.org" target="_blank">OpenSky website</a> directly<br>
-      4. Register a free account at opensky-network.org for higher rate limits<br><br>
-      <em>Tip: The anonymous API allows 400 req/day. Authenticated: 4000/day.</em>
+      Click the <strong style="color:#ff6b35;">⚙ DEBUG</strong> button in the header to diagnose the issue.
     </div>`;
 
   // Draw empty radar
@@ -962,6 +986,67 @@ function radarLoop() {
 function startAutoRefresh() {
   fetchData();
   setInterval(fetchData, 15000);
+}
+
+// ──────────────────────────────────────────────
+// Debug Panel
+// ──────────────────────────────────────────────
+let _debugOpen = false;
+
+async function toggleDebug() {
+  _debugOpen = !_debugOpen;
+  const panel = document.getElementById('debugPanel');
+  panel.style.display = _debugOpen ? 'block' : 'none';
+  if (_debugOpen) await refreshDebug();
+}
+
+async function refreshDebug() {
+  // Config
+  document.getElementById('debugConfig').textContent =
+    `Airport : ${AIRPORT.icao} — ${AIRPORT.name}\n` +
+    `Center  : ${AIRPORT.lat}°N, ${AIRPORT.lon}°E\n` +
+    `Radius  : ${AIRPORT.radius_km} km\n` +
+    `BBOX    : lamin=${BBOX.lamin.toFixed(4)} lomin=${BBOX.lomin.toFixed(4)} lamax=${BBOX.lamax.toFixed(4)} lomax=${BBOX.lomax.toFixed(4)}\n` +
+    `Runways : ${AIRPORT.runways.map(r => r.id).join(', ')}`;
+
+  // Last error
+  document.getElementById('debugError').textContent = window._lastError || 'None';
+
+  // Server /api/debug
+  try {
+    const r = await fetch('/api/debug');
+    const j = await r.json();
+    document.getElementById('debugServer').textContent =
+      `Status          : HTTP ${r.status}\n` +
+      `Mode            : ${j.mode}\n` +
+      `OPENSKY_USER    : ${j.opensky_user_set ? '✓ set → ' + j.opensky_user_value : '✗ NOT SET'}\n` +
+      `OPENSKY_PASS    : ${j.opensky_pass_set ? '✓ set (' + j.opensky_pass_length + ' chars)' : '✗ NOT SET'}\n` +
+      `Node version    : ${j.node_version}\n` +
+      `Server time     : ${j.time}`;
+  } catch(e) {
+    document.getElementById('debugServer').textContent = 'Failed to reach /api/debug: ' + e.message;
+  }
+
+  // Raw OpenSky call
+  try {
+    const url = `/api/opensky?lamin=${BBOX.lamin.toFixed(4)}&lomin=${BBOX.lomin.toFixed(4)}&lamax=${BBOX.lamax.toFixed(4)}&lomax=${BBOX.lomax.toFixed(4)}`;
+    const r = await fetch(url);
+    const text = await r.text();
+    let preview = '';
+    try {
+      const j = JSON.parse(text);
+      const stateCount = j.states ? j.states.length : 0;
+      preview = `HTTP Status : ${r.status}\n` +
+                `States      : ${stateCount} aircraft\n` +
+                `Time        : ${j.time}\n\n` +
+                `Raw (first 500 chars):\n${text.substring(0, 500)}`;
+    } catch {
+      preview = `HTTP Status : ${r.status}\nBody: ${text.substring(0, 500)}`;
+    }
+    document.getElementById('debugOpensky').textContent = preview;
+  } catch(e) {
+    document.getElementById('debugOpensky').textContent = 'Failed: ' + e.message;
+  }
 }
 
 // Init
