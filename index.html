@@ -871,6 +871,8 @@ function analyzeTraffic(states) {
 // ──────────────────────────────────────────────
 // Fetch from OpenSky
 // ──────────────────────────────────────────────
+// adsb.lol API — free, no auth, CORS-friendly, called directly from browser
+// Covers a lat/lon bounding box, returns aircraft array
 async function fetchData() {
   const btn = document.getElementById('refreshBtn');
   const dot = document.getElementById('statusDot');
@@ -879,16 +881,22 @@ async function fetchData() {
   dot.className = 'status-dot';
   txt.textContent = 'FETCHING…';
 
-  const url = `/api/opensky?lamin=${BBOX.lamin.toFixed(4)}&lomin=${BBOX.lomin.toFixed(4)}&lamax=${BBOX.lamax.toFixed(4)}&lomax=${BBOX.lomax.toFixed(4)}`;
-
+  // adsb.lol /v2/lat/lon/dist endpoint — center + radius in nautical miles
+  // LFPG center, 5km ≈ 2.7nm — use 5nm to be safe
+  const NM = 5;
+  const url = `https://api.adsb.lol/v2/lat/${AIRPORT.lat}/lon/${AIRPORT.lon}/dist/${NM}`;
 
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const states = data.states || [];
 
-    const { aircraft, approaching, activeRwys } = analyzeTraffic(states);
+    // adsb.lol returns { ac: [...], msg, now, total, ctime, ptime }
+    // Each aircraft has: hex, flight, lat, lon, alt_baro, alt_geom,
+    //   gs (ground speed), track (heading), baro_rate, on_ground, etc.
+    const acList = data.ac || [];
+
+    const { aircraft, approaching, activeRwys } = analyzeTrafficADSBLol(acList);
     allAircraft = aircraft;
     approachAircraft = approaching;
     activeRunways = activeRwys;
@@ -896,7 +904,7 @@ async function fetchData() {
 
     updateUI();
     dot.className = 'status-dot live';
-    txt.textContent = 'LIVE';
+    txt.textContent = 'LIVE · adsb.lol';
     document.getElementById('updateTime').textContent =
       'UPD ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) + 'Z';
 
@@ -968,9 +976,9 @@ function updateUI() {
 
   sorted.forEach(ac => {
     const app = approachAircraft.find(x => x.icao === ac.icao);
-    const alt = ac.alt_m != null ? Math.round(ac.alt_m) + 'm' : '—';
+    const alt = ac.alt_ft != null ? Math.round(ac.alt_ft) + 'ft' : '—';
     const hdg = ac.heading != null ? String(Math.round(ac.heading)).padStart(3,'0') + '°' : '—';
-    const vs = ac.vs != null ? (ac.vs > 0 ? '+' : '') + Math.round(ac.vs) + 'm/s' : '—';
+    const vs = ac.vs != null ? (ac.vs > 0 ? '+' : '') + Math.round(ac.vs) + 'fpm' : '—';
     const dist = ac.dist_km.toFixed(1) + 'km';
     let badge = '';
     if (app) {
