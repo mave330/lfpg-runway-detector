@@ -1,0 +1,12 @@
+{
+  "name": "lfpg-runway-detector",
+  "version": "1.0.0",
+  "description": "Live ADS-B runway detector for Paris CDG (LFPG)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
