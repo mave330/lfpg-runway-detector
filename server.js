@@ -14,14 +14,19 @@ const MIME = {
   '.ico':  'image/x-icon',
 };
 
+// Multiple sources with correct URL formats
 const SOURCES = [
   {
+    name: 'adsb.fi',
+    buildUrl: (lat, lon) => `https://opendata.adsb.fi/api/v2/lat/${lat}/lon/${lon}/dist/3`,
+  },
+  {
     name: 'airplanes.live',
-    buildUrl: (lat, lon) => `https://api.airplanes.live/v2/lat/${lat}/lon/${lon}/dist/3`,
+    buildUrl: (lat, lon) => `https://api.airplanes.live/v2/point/${lat}/${lon}/3`,
   },
   {
     name: 'adsb.one',
-    buildUrl: (lat, lon) => `https://api.adsb.one/v2/lat/${lat}/lon/${lon}/dist/3`,
+    buildUrl: (lat, lon) => `https://api.adsb.one/v2/point/${lat}/${lon}/3`,
   },
 ];
 
@@ -57,24 +62,23 @@ function parseAircraft(raw) {
 function tryFetch(sourceIndex, lat, lon, res) {
   if (sourceIndex >= SOURCES.length) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ states: [], error: 'All ADS-B sources unreachable from this server' }));
+    return res.end(JSON.stringify({ states: [], error: 'All ADS-B sources failed' }));
   }
 
   const source = SOURCES[sourceIndex];
   const targetUrl = source.buildUrl(lat, lon);
-  console.log(`[${new Date().toISOString()}] → ${source.name}`);
+  console.log(`[${new Date().toISOString()}] → ${source.name}: ${targetUrl}`);
 
-  const headers = {
-    'Accept': 'application/json',
-    'User-Agent': 'Mozilla/5.0 (compatible; RunwayDetector/1.0)',
-  };
-
-  const req = https.get(targetUrl, { headers }, (apiRes) => {
+  const req = https.get(targetUrl, {
+    headers: {
+      'Accept': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (compatible; RunwayDetector/1.0)',
+    }
+  }, (apiRes) => {
     let data = '';
     apiRes.on('data', chunk => data += chunk);
     apiRes.on('end', () => {
       console.log(`[${new Date().toISOString()}] ← ${source.name} HTTP ${apiRes.statusCode} · ${data.length} bytes`);
-
       if (apiRes.statusCode !== 200 || data.length < 5) {
         return tryFetch(sourceIndex + 1, lat, lon, res);
       }
@@ -84,7 +88,7 @@ function tryFetch(sourceIndex, lat, lon, res) {
         res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' });
         res.end(JSON.stringify({ states: parsed.states, time: parsed.time, source: source.name }));
       } catch (e) {
-        console.log(`  Parse error: ${e.message}`);
+        console.log(`  Parse error: ${e.message}, trying next`);
         tryFetch(sourceIndex + 1, lat, lon, res);
       }
     });
@@ -105,7 +109,7 @@ function tryFetch(sourceIndex, lat, lon, res) {
 const server = http.createServer((req, res) => {
   const parsed = url.parse(req.url, true);
 
-  // Health check — Railway uses this to confirm the app is alive
+  // Railway health check
   if (parsed.pathname === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ status: 'ok', time: new Date().toISOString() }));
@@ -114,7 +118,7 @@ const server = http.createServer((req, res) => {
   if (parsed.pathname === '/api/debug') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({
-      sources: SOURCES.map(s => s.name),
+      sources: SOURCES.map(s => ({ name: s.name, url: s.buildUrl('49.0097', '2.5479') })),
       node_version: process.version,
       time: new Date().toISOString(),
     }, null, 2));
@@ -144,12 +148,11 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n  ✈  LFPG Runway Detector · port ${PORT}`);
-  console.log(`  Health : http://localhost:${PORT}/health`);
-  console.log(`  Sources: ${SOURCES.map(s => s.name).join(' → ')}\n`);
+  console.log(`  Health  : http://localhost:${PORT}/health`);
+  console.log(`  Sources : ${SOURCES.map(s => s.name).join(' → ')}\n`);
 });
 
-// Handle Railway SIGTERM gracefully
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
+  console.log('SIGTERM — shutting down');
   server.close(() => process.exit(0));
 });
