@@ -147,3 +147,9 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`  Health : http://localhost:${PORT}/health`);
   console.log(`  Sources: ${SOURCES.map(s => s.name).join(' → ')}\n`);
 });
+
+// Handle Railway SIGTERM gracefully
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => process.exit(0));
+});

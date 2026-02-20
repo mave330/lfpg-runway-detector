@@ -2,4 +2,3 @@
 startCommand = "node server.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
-restartPolicyType = "on_failure"
