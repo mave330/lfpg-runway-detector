@@ -505,7 +505,7 @@
       <div><span>ELEV </span><strong>119 ft</strong></div>
       <div><span>LAT </span><strong>49.0097°N</strong></div>
       <div><span>LON </span><strong>2.5479°E</strong></div>
-      <div><span>RADIUS </span><strong>5 km</strong></div>
+      <div><span>RADIUS </span><strong>15 nm</strong></div>
     </div>
 
     <div class="stat-row">
@@ -881,22 +881,15 @@ async function fetchData() {
   dot.className = 'status-dot';
   txt.textContent = 'FETCHING…';
 
-  // adsb.lol /v2/lat/lon/dist endpoint — center + radius in nautical miles
-  // LFPG center, 5km ≈ 2.7nm — use 5nm to be safe
-  const NM = 5;
-  const url = `https://api.adsb.lol/v2/lat/${AIRPORT.lat}/lon/${AIRPORT.lon}/dist/${NM}`;
+  const url = `/api/opensky?lamin=${BBOX.lamin.toFixed(4)}&lomin=${BBOX.lomin.toFixed(4)}&lamax=${BBOX.lamax.toFixed(4)}&lomax=${BBOX.lomax.toFixed(4)}`;
 
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
+    const states = data.states || [];
 
-    // adsb.lol returns { ac: [...], msg, now, total, ctime, ptime }
-    // Each aircraft has: hex, flight, lat, lon, alt_baro, alt_geom,
-    //   gs (ground speed), track (heading), baro_rate, on_ground, etc.
-    const acList = data.ac || [];
-
-    const { aircraft, approaching, activeRwys } = analyzeTrafficADSBLol(acList);
+    const { aircraft, approaching, activeRwys } = analyzeTraffic(states);
     allAircraft = aircraft;
     approachAircraft = approaching;
     activeRunways = activeRwys;
@@ -904,7 +897,7 @@ async function fetchData() {
 
     updateUI();
     dot.className = 'status-dot live';
-    txt.textContent = 'LIVE · adsb.lol';
+    txt.textContent = `LIVE · ${data.source || 'adsb.fi'}`;
     document.getElementById('updateTime').textContent =
       'UPD ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) + 'Z';
 
