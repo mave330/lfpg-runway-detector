@@ -141,6 +141,11 @@ const server = http.createServer((req, res) => {
     }, null, 2));
   }
 
+  if (parsed.pathname === '/api/sia') {
+    fetchSIA(res);
+    return;
+  }
+
   if (parsed.pathname === '/api/opensky') {
     tryFetch(0, res);
     return;
@@ -167,3 +172,38 @@ process.on('SIGTERM', () => {
   console.log('SIGTERM — shutting down gracefully');
   server.close(() => process.exit(0));
 });
+
+// ── SIA Official Data Proxy ──
+// Serves the official French AIP aeronautical XML from data.gouv.fr
+// So the frontend can parse exact LFPG runway coordinates from source
+const SIA_XML_URL = 'https://www.data.gouv.fr/api/1/datasets/r/286d2c5d-d833-4d3c-a221-04ee919eb83f';
+let siaCache = null;
+let siaCacheTime = 0;
+const SIA_TTL = 24 * 3600 * 1000; // refresh once per day
+
+function fetchSIA(res) {
+  const now = Date.now();
+  if (siaCache && (now - siaCacheTime) < SIA_TTL) {
+    res.writeHead(200, { 'Content-Type': 'application/xml', 'Cache-Control': 'max-age=86400' });
+    return res.end(siaCache);
+  }
+  https.get(SIA_XML_URL, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LFPG-RunwayDetector/1.0)' }
+  }, (apiRes) => {
+    let data = '';
+    apiRes.on('data', c => data += c);
+    apiRes.on('end', () => {
+      if (apiRes.statusCode === 200 && data.length > 100) {
+        siaCache = data;
+        siaCacheTime = now;
+        console.log(`[SIA] Fetched ${data.length} bytes of official aeronautical data`);
+      }
+      res.writeHead(apiRes.statusCode, { 'Content-Type': 'application/xml', 'Cache-Control': 'max-age=86400' });
+      res.end(data);
+    });
+  }).on('error', (err) => {
+    console.error('[SIA] Fetch error:', err.message);
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: err.message }));
+  });
+}
