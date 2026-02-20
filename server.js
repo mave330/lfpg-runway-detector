@@ -14,98 +14,111 @@ const MIME = {
   '.ico':  'image/x-icon',
 };
 
-// Try multiple sources in order until one works
-const SOURCES = [
-  {
-    name: 'adsb.one',
-    buildUrl: (lat, lon) => `https://api.adsb.one/v2/lat/${lat}/lon/${lon}/dist/3`,
-    parse: parseAdsbExchangeV2,
-  },
-  {
-    name: 'adsbexchange (globe)',
-    buildUrl: (lat, lon) => `https://globe.adsbexchange.com/re-api/?circle=${lat},${lon},5`,
-    parse: parseAdsbExchangeV2,
-  },
-  {
-    name: 'airplanes.live',
-    buildUrl: (lat, lon) => `https://api.airplanes.live/v2/lat/${lat}/lon/${lon}/dist/3`,
-    parse: parseAdsbExchangeV2,
-  },
-];
+function fetchUrl(targetUrl, callback) {
+  const options = {
+    headers: {
+      'Accept': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (compatible; LFPG-RunwayDetector/1.0)',
+    },
+    timeout: 10000,
+  };
+  const req = https.get(targetUrl, options, (apiRes) => {
+    let data = '';
+    apiRes.on('data', chunk => data += chunk);
+    apiRes.on('end', () => callback(null, apiRes.statusCode, data));
+  });
+  req.on('error', (err) => callback(err));
+  req.on('timeout', () => { req.destroy(); callback(new Error('timeout')); });
+}
 
-function parseAdsbExchangeV2(raw) {
+function parseAc(raw) {
   const data = JSON.parse(raw);
   const aircraft = data.ac || data.aircraft || [];
+
+  // Log first aircraft raw to understand the shape
+  if (aircraft.length > 0) {
+    console.log('  Sample aircraft raw:', JSON.stringify(aircraft[0]).substring(0, 300));
+  } else {
+    console.log('  No aircraft in response. Keys:', Object.keys(data).join(', '));
+    console.log('  Raw preview:', raw.substring(0, 200));
+  }
+
   const states = aircraft
-    .filter(ac => ac.lat != null && ac.lon != null)
+    .filter(ac => {
+      const hasPos = ac.lat != null && ac.lon != null;
+      const onGround = ac.alt_baro === 'ground';
+      if (!hasPos) return false;
+      if (onGround) return false;
+      return true;
+    })
     .map(ac => {
-      const baroFt   = ac.alt_baro === 'ground' ? 0 : (parseFloat(ac.alt_baro) || 0);
-      const geoFt    = parseFloat(ac.alt_geom) || baroFt;
-      const onGround = ac.alt_baro === 'ground' || (parseFloat(ac.gs) || 0) < 30;
+      const baroFt = parseFloat(ac.alt_baro) || 0;
+      const geoFt  = parseFloat(ac.alt_geom) || baroFt;
       return [
         ac.hex,
         (ac.flight || '').trim() || ac.hex,
         null, null, null,
         parseFloat(ac.lon),
         parseFloat(ac.lat),
-        baroFt * 0.3048,
-        onGround,
-        (parseFloat(ac.gs) || 0) * 0.514444,
-        parseFloat(ac.track) || null,
-        (parseFloat(ac.baro_rate) || 0) * 0.00508,
+        baroFt * 0.3048,       // baro alt in meters
+        false,                  // on_ground (already filtered above)
+        (parseFloat(ac.gs) || 0) * 0.514444, // knots → m/s
+        parseFloat(ac.track) ?? null,         // heading
+        (parseFloat(ac.baro_rate) || 0) * 0.00508, // ft/min → m/s
         null,
         geoFt * 0.3048,
         ac.squawk || null,
         false, 0,
       ];
     });
-  return { states, time: data.now };
+
+  return { states, time: data.now, total: aircraft.length };
 }
 
-function tryFetch(sourceIndex, lat, lon, res) {
-  if (sourceIndex >= SOURCES.length) {
-    console.error('All sources failed');
+const SOURCES = [
+  {
+    name: 'airplanes.live',
+    url: (lat, lon) => `https://api.airplanes.live/v2/lat/${lat}/lon/${lon}/dist/3`,
+  },
+  {
+    name: 'adsb.one',
+    url: (lat, lon) => `https://api.adsb.one/v2/lat/${lat}/lon/${lon}/dist/3`,
+  },
+];
+
+function trySource(i, lat, lon, res) {
+  if (i >= SOURCES.length) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ error: 'All ADS-B sources failed or returned no data' }));
+    return res.end(JSON.stringify({ error: 'All sources failed', states: [] }));
   }
 
-  const source = SOURCES[sourceIndex];
-  const targetUrl = source.buildUrl(lat, lon);
-  console.log(`[${new Date().toISOString()}] → Trying ${source.name}: ${targetUrl}`);
+  const src = SOURCES[i];
+  const targetUrl = src.url(lat, lon);
+  console.log(`\n[${new Date().toISOString()}] → ${src.name}: ${targetUrl}`);
 
-  const headers = {
-    'Accept': 'application/json',
-    'User-Agent': 'Mozilla/5.0 (compatible; LFPG-RunwayDetector/1.0)',
-    'Referer': 'https://globe.adsbexchange.com/',
-  };
+  fetchUrl(targetUrl, (err, status, data) => {
+    if (err) {
+      console.log(`  ✗ ${src.name} error: ${err.message}`);
+      return trySource(i + 1, lat, lon, res);
+    }
 
-  https.get(targetUrl, { headers, timeout: 8000 }, (apiRes) => {
-    let data = '';
-    apiRes.on('data', chunk => data += chunk);
-    apiRes.on('end', () => {
-      console.log(`[${new Date().toISOString()}] ← ${source.name} HTTP ${apiRes.statusCode} · ${data.length} bytes`);
+    console.log(`  ← HTTP ${status}, ${data.length} bytes`);
 
-      if (apiRes.statusCode !== 200 || data.length < 10) {
-        console.log(`  → ${source.name} failed (${apiRes.statusCode}), trying next source`);
-        return tryFetch(sourceIndex + 1, lat, lon, res);
-      }
+    if (status !== 200) {
+      console.log(`  ✗ ${src.name} non-200, body: ${data.substring(0, 100)}`);
+      return trySource(i + 1, lat, lon, res);
+    }
 
-      try {
-        const parsed = source.parse(data);
-        console.log(`  ✓ ${source.name} OK — ${parsed.states.length} aircraft`);
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' });
-        res.end(JSON.stringify({ states: parsed.states, time: parsed.time, source: source.name }));
-      } catch (e) {
-        console.log(`  → ${source.name} parse error: ${e.message}, trying next`);
-        tryFetch(sourceIndex + 1, lat, lon, res);
-      }
-    });
-  }).on('error', (err) => {
-    console.log(`  → ${source.name} error: ${err.message}, trying next source`);
-    tryFetch(sourceIndex + 1, lat, lon, res);
-  }).on('timeout', () => {
-    console.log(`  → ${source.name} timeout, trying next source`);
-    tryFetch(sourceIndex + 1, lat, lon, res);
+    try {
+      const parsed = parseAc(data);
+      console.log(`  ✓ ${src.name}: ${parsed.total} total, ${parsed.states.length} airborne`);
+
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' });
+      res.end(JSON.stringify({ states: parsed.states, time: parsed.time, source: src.name }));
+    } catch (e) {
+      console.log(`  ✗ Parse error: ${e.message}`);
+      trySource(i + 1, lat, lon, res);
+    }
   });
 }
 
@@ -125,11 +138,11 @@ const server = http.createServer((req, res) => {
     const { lamin, lomin, lamax, lomax } = parsed.query;
     if (!lamin) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ error: 'Missing bbox parameters' }));
+      return res.end(JSON.stringify({ error: 'Missing parameters' }));
     }
     const lat = ((parseFloat(lamin) + parseFloat(lamax)) / 2).toFixed(4);
     const lon = ((parseFloat(lomin) + parseFloat(lomax)) / 2).toFixed(4);
-    tryFetch(0, lat, lon, res);
+    trySource(0, lat, lon, res);
     return;
   }
 
