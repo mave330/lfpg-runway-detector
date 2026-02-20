@@ -527,144 +527,189 @@
 
     <!-- Runway Diagram -->
     <div class="diagram-container">
-      <svg id="rwyDiagram" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg">
+      <svg id="rwyDiagram" viewBox="0 0 620 460" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow-green">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-blue">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <marker id="arrow-approach" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L6,3 Z" fill="#00ff9d" opacity="0.8"/>
+          </marker>
+        </defs>
+
         <!-- Background -->
-        <rect width="600" height="500" fill="#050a0e" rx="6"/>
+        <rect width="620" height="460" fill="#050a0e"/>
 
-        <!-- Airport boundary subtle -->
-        <ellipse cx="300" cy="250" rx="270" ry="220" fill="none" stroke="rgba(0,212,255,0.05)" stroke-width="1"/>
+        <!-- ═══════════════════════════════════════════════════
+             LFPG CORRECT LAYOUT — N to S:
+             Row 1 (y=100): 08L/26R  north outer  4215m LONG
+             Row 2 (y=170): 09L/27R  north inner  2700m short
+             Row 3 (y=270): 08R/26L  south inner  2700m short
+             Row 4 (y=340): 09R/27L  south outer  4200m LONG
+             All headings 084° / 264°
+             West (left) = 08x thresholds
+             East (right) = 26x/27x thresholds
+        ═══════════════════════════════════════════════════ -->
 
-        <!-- North indicator -->
-        <g transform="translate(555,30)">
-          <line x1="0" y1="14" x2="0" y2="-14" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
-          <polygon points="0,-14 -4,-4 4,-4" fill="rgba(0,212,255,0.6)"/>
-          <text x="0" y="26" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="9" fill="rgba(0,212,255,0.5)">N</text>
-        </g>
-
-        <!-- Scale bar -->
-        <g transform="translate(24,470)">
-          <line x1="0" y1="0" x2="60" y2="0" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="0" y1="-3" x2="0" y2="3" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="60" y1="-3" x2="60" y2="3" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <text x="30" y="-6" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(0,212,255,0.4)">~3 km</text>
-        </g>
-
-        <!-- ═══════════════════════════════════════════
-             LFPG RUNWAY LAYOUT
-             Northern complex: 08L/26R and 09L/27R
-             Southern complex: 08R/26L and 09R/27L
-             HDG 083° and 093° (slight divergence)
-             Runway length ~4km, width visual ~12px
-             Northern pair: y ≈ 160 / 210
-             Southern pair: y ≈ 290 / 340
-        ═══════════════════════════════════════════ -->
-
-        <!-- ── NORTHERN PAIR ── -->
-
-        <!-- 08L / 26R  (y=155, HDG 083°) -->
+        <!-- ── ROW 1: 08L/26R — North Outer — LONG (4215m) ── -->
         <g id="rwy_08L_26R">
-          <!-- Glow layer (active) -->
-          <rect id="glow_08L_26R" x="50" y="147" width="500" height="16" rx="2"
-                fill="rgba(0,255,157,0)" class="rwy-glow"/>
-          <!-- Strip -->
-          <rect id="strip_08L_26R" x="50" y="149" width="500" height="12" rx="2"
-                fill="#0f2a1a" stroke="#1a3a2a" stroke-width="1" class="rwy-svg-strip"/>
-          <!-- Centerline dashes -->
-          <line x1="70" y1="155" x2="530" y2="155" stroke="rgba(255,255,255,0.08)"
-                stroke-width="1" stroke-dasharray="20 12"/>
-          <!-- Threshold markers 08L -->
-          <rect x="50" y="149" width="8" height="12" fill="rgba(0,212,255,0.15)" rx="1"/>
-          <!-- Threshold markers 26R -->
-          <rect x="542" y="149" width="8" height="12" fill="rgba(0,212,255,0.15)" rx="1"/>
+          <rect id="glow_08L_26R" x="38" y="93" width="544" height="14" rx="2" fill="none"/>
+          <rect id="strip_08L_26R" x="38" y="95" width="544" height="10" rx="1"
+                fill="#0d1f10" stroke="#1c3820" stroke-width="1"/>
+          <line x1="58" y1="100" x2="562" y2="100"
+                stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="18 10"/>
+          <!-- Threshold bars -->
+          <rect x="38" y="95" width="6" height="10" rx="1" fill="rgba(0,212,255,0.18)"/>
+          <rect x="576" y="95" width="6" height="10" rx="1" fill="rgba(0,212,255,0.18)"/>
           <!-- Labels -->
-          <text id="lbl_08L" x="36" y="159" text-anchor="end" fill="#1a4a3a" class="rwy-svg-label">08L</text>
-          <text id="lbl_26R" x="564" y="159" text-anchor="start" fill="#1a4a3a" class="rwy-svg-label">26R</text>
-          <!-- Headings -->
-          <text x="36" y="170" text-anchor="end" fill="#0f3a2a" class="rwy-svg-hdg">083°</text>
-          <text x="564" y="170" text-anchor="start" fill="#0f3a2a" class="rwy-svg-hdg">263°</text>
+          <text id="lbl_08L" x="28" y="103" text-anchor="end" font-family="Orbitron,sans-serif"
+                font-size="11" font-weight="700" fill="#1c4020">08L</text>
+          <text id="lbl_26R" x="592" y="103" text-anchor="start" font-family="Orbitron,sans-serif"
+                font-size="11" font-weight="700" fill="#1c4020">26R</text>
+          <text x="28" y="114" text-anchor="end" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="#0f2a14">084°</text>
+          <text x="592" y="114" text-anchor="start" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="#0f2a14">264°</text>
+          <!-- Length indicator -->
+          <text x="310" y="92" text-anchor="middle" font-family="Share Tech Mono,monospace"
+                font-size="7" fill="rgba(0,212,255,0.2)">4215m</text>
         </g>
 
-        <!-- 09L / 27R  (y=205, HDG 093°) — slightly angled right -->
+        <!-- ── ROW 2: 09L/27R — North Inner — SHORT (2700m) ── -->
         <g id="rwy_09L_27R">
-          <rect id="glow_09L_27R" x="90" y="197" width="460" height="16" rx="2"
-                fill="rgba(0,255,157,0)" class="rwy-glow"/>
-          <rect id="strip_09L_27R" x="90" y="199" width="460" height="12" rx="2"
-                fill="#0f2a1a" stroke="#1a3a2a" stroke-width="1" class="rwy-svg-strip"/>
-          <line x1="108" y1="205" x2="532" y2="205" stroke="rgba(255,255,255,0.08)"
-                stroke-width="1" stroke-dasharray="20 12"/>
-          <rect x="90" y="199" width="8" height="12" fill="rgba(0,212,255,0.15)" rx="1"/>
-          <rect x="542" y="199" width="8" height="12" fill="rgba(0,212,255,0.15)" rx="1"/>
-          <text id="lbl_09L" x="76" y="209" text-anchor="end" fill="#1a4a3a" class="rwy-svg-label">09L</text>
-          <text id="lbl_27R" x="564" y="209" text-anchor="start" fill="#1a4a3a" class="rwy-svg-label">27R</text>
-          <text x="76" y="220" text-anchor="end" fill="#0f3a2a" class="rwy-svg-hdg">093°</text>
-          <text x="564" y="220" text-anchor="start" fill="#0f3a2a" class="rwy-svg-hdg">273°</text>
+          <rect id="glow_09L_27R" x="138" y="163" width="344" height="14" rx="2" fill="none"/>
+          <rect id="strip_09L_27R" x="138" y="165" width="344" height="10" rx="1"
+                fill="#0d1f10" stroke="#1c3820" stroke-width="1"/>
+          <line x1="155" y1="170" x2="465" y2="170"
+                stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="18 10"/>
+          <rect x="138" y="165" width="6" height="10" rx="1" fill="rgba(0,212,255,0.18)"/>
+          <rect x="476" y="165" width="6" height="10" rx="1" fill="rgba(0,212,255,0.18)"/>
+          <text id="lbl_09L" x="128" y="173" text-anchor="end" font-family="Orbitron,sans-serif"
+                font-size="11" font-weight="700" fill="#1c4020">09L</text>
+          <text id="lbl_27R" x="492" y="173" text-anchor="start" font-family="Orbitron,sans-serif"
+                font-size="11" font-weight="700" fill="#1c4020">27R</text>
+          <text x="128" y="184" text-anchor="end" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="#0f2a14">084°</text>
+          <text x="492" y="184" text-anchor="start" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="#0f2a14">264°</text>
+          <text x="310" y="162" text-anchor="middle" font-family="Share Tech Mono,monospace"
+                font-size="7" fill="rgba(0,212,255,0.2)">2700m</text>
         </g>
 
-        <!-- Taxiway connector north -->
-        <line x1="300" y1="161" x2="300" y2="199" stroke="rgba(0,212,255,0.08)" stroke-width="2"/>
-        <line x1="180" y1="161" x2="180" y2="199" stroke="rgba(0,212,255,0.06)" stroke-width="1.5"/>
-        <line x1="420" y1="161" x2="420" y2="199" stroke="rgba(0,212,255,0.06)" stroke-width="1.5"/>
+        <!-- North complex taxiway connectors -->
+        <line x1="310" y1="105" x2="310" y2="165" stroke="rgba(0,212,255,0.07)" stroke-width="2"/>
+        <line x1="200" y1="105" x2="200" y2="165" stroke="rgba(0,212,255,0.05)" stroke-width="1.5" stroke-dasharray="3 4"/>
+        <line x1="420" y1="105" x2="420" y2="165" stroke="rgba(0,212,255,0.05)" stroke-width="1.5" stroke-dasharray="3 4"/>
 
-        <!-- North terminal area suggestion -->
-        <rect x="200" y="228" width="200" height="16" rx="3"
-              fill="rgba(0,212,255,0.04)" stroke="rgba(0,212,255,0.08)" stroke-width="1"/>
-        <text x="300" y="240" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.25)">CDG 1 · CDG 2</text>
+        <!-- T1/T2 terminal hint -->
+        <rect x="220" y="193" width="180" height="14" rx="3"
+              fill="rgba(0,212,255,0.03)" stroke="rgba(0,212,255,0.07)" stroke-width="1"/>
+        <text x="310" y="204" text-anchor="middle" font-family="Share Tech Mono,monospace"
+              font-size="8" fill="rgba(0,212,255,0.2)" letter-spacing="2">TERMINAL 2</text>
 
-        <!-- ── SOUTHERN PAIR ── -->
+        <!-- Separation line -->
+        <line x1="30" y1="228" x2="590" y2="228"
+              stroke="rgba(0,212,255,0.06)" stroke-width="1" stroke-dasharray="4 8"/>
+        <text x="310" y="233" text-anchor="middle" font-family="Share Tech Mono,monospace"
+              font-size="7" fill="rgba(0,212,255,0.12)" letter-spacing="3">· · APRON · ·</text>
 
-        <!-- 08R / 26L  (y=295, HDG 083°) -->
+        <!-- ── ROW 3: 08R/26L — South Inner — SHORT (2700m) ── -->
         <g id="rwy_08R_26L">
-          <rect id="glow_08R_26L" x="50" y="287" width="500" height="16" rx="2"
-                fill="rgba(0,255,157,0)" class="rwy-glow"/>
-          <rect id="strip_08R_26L" x="50" y="289" width="500" height="12" rx="2"
-                fill="#0f2a1a" stroke="#1a3a2a" stroke-width="1" class="rwy-svg-strip"/>
-          <line x1="70" y1="295" x2="530" y2="295" stroke="rgba(255,255,255,0.08)"
-                stroke-width="1" stroke-dasharray="20 12"/>
-          <rect x="50" y="289" width="8" height="12" fill="rgba(0,212,255,0.15)" rx="1"/>
-          <rect x="542" y="289" width="8" height="12" fill="rgba(0,212,255,0.15)" rx="1"/>
-          <text id="lbl_08R" x="36" y="299" text-anchor="end" fill="#1a4a3a" class="rwy-svg-label">08R</text>
-          <text id="lbl_26L" x="564" y="299" text-anchor="start" fill="#1a4a3a" class="rwy-svg-label">26L</text>
-          <text x="36" y="310" text-anchor="end" fill="#0f3a2a" class="rwy-svg-hdg">083°</text>
-          <text x="564" y="310" text-anchor="start" fill="#0f3a2a" class="rwy-svg-hdg">263°</text>
+          <rect id="glow_08R_26L" x="138" y="258" width="344" height="14" rx="2" fill="none"/>
+          <rect id="strip_08R_26L" x="138" y="260" width="344" height="10" rx="1"
+                fill="#0d1f10" stroke="#1c3820" stroke-width="1"/>
+          <line x1="155" y1="265" x2="465" y2="265"
+                stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="18 10"/>
+          <rect x="138" y="260" width="6" height="10" rx="1" fill="rgba(0,212,255,0.18)"/>
+          <rect x="476" y="260" width="6" height="10" rx="1" fill="rgba(0,212,255,0.18)"/>
+          <text id="lbl_08R" x="128" y="268" text-anchor="end" font-family="Orbitron,sans-serif"
+                font-size="11" font-weight="700" fill="#1c4020">08R</text>
+          <text id="lbl_26L" x="492" y="268" text-anchor="start" font-family="Orbitron,sans-serif"
+                font-size="11" font-weight="700" fill="#1c4020">26L</text>
+          <text x="128" y="279" text-anchor="end" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="#0f2a14">084°</text>
+          <text x="492" y="279" text-anchor="start" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="#0f2a14">264°</text>
+          <text x="310" y="257" text-anchor="middle" font-family="Share Tech Mono,monospace"
+                font-size="7" fill="rgba(0,212,255,0.2)">2700m</text>
         </g>
 
-        <!-- 09R / 27L  (y=345, HDG 093°) -->
+        <!-- ── ROW 4: 09R/27L — South Outer — LONG (4200m) ── -->
         <g id="rwy_09R_27L">
-          <rect id="glow_09R_27L" x="90" y="337" width="460" height="16" rx="2"
-                fill="rgba(0,255,157,0)" class="rwy-glow"/>
-          <rect id="strip_09R_27L" x="90" y="339" width="460" height="12" rx="2"
-                fill="#0f2a1a" stroke="#1a3a2a" stroke-width="1" class="rwy-svg-strip"/>
-          <line x1="108" y1="345" x2="532" y2="345" stroke="rgba(255,255,255,0.08)"
-                stroke-width="1" stroke-dasharray="20 12"/>
-          <rect x="90" y="339" width="8" height="12" fill="rgba(0,212,255,0.15)" rx="1"/>
-          <rect x="542" y="339" width="8" height="12" fill="rgba(0,212,255,0.15)" rx="1"/>
-          <text id="lbl_09R" x="76" y="349" text-anchor="end" fill="#1a4a3a" class="rwy-svg-label">09R</text>
-          <text id="lbl_27L" x="564" y="349" text-anchor="start" fill="#1a4a3a" class="rwy-svg-label">27L</text>
-          <text x="76" y="360" text-anchor="end" fill="#0f3a2a" class="rwy-svg-hdg">093°</text>
-          <text x="564" y="360" text-anchor="start" fill="#0f3a2a" class="rwy-svg-hdg">273°</text>
+          <rect id="glow_09R_27L" x="38" y="328" width="544" height="14" rx="2" fill="none"/>
+          <rect id="strip_09R_27L" x="38" y="330" width="544" height="10" rx="1"
+                fill="#0d1f10" stroke="#1c3820" stroke-width="1"/>
+          <line x1="58" y1="335" x2="562" y2="335"
+                stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="18 10"/>
+          <rect x="38" y="330" width="6" height="10" rx="1" fill="rgba(0,212,255,0.18)"/>
+          <rect x="576" y="330" width="6" height="10" rx="1" fill="rgba(0,212,255,0.18)"/>
+          <text id="lbl_09R" x="28" y="338" text-anchor="end" font-family="Orbitron,sans-serif"
+                font-size="11" font-weight="700" fill="#1c4020">09R</text>
+          <text id="lbl_27L" x="592" y="338" text-anchor="start" font-family="Orbitron,sans-serif"
+                font-size="11" font-weight="700" fill="#1c4020">27L</text>
+          <text x="28" y="349" text-anchor="end" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="#0f2a14">084°</text>
+          <text x="592" y="349" text-anchor="start" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="#0f2a14">264°</text>
+          <text x="310" y="327" text-anchor="middle" font-family="Share Tech Mono,monospace"
+                font-size="7" fill="rgba(0,212,255,0.2)">4200m</text>
         </g>
 
-        <!-- Taxiway connector south -->
-        <line x1="300" y1="301" x2="300" y2="339" stroke="rgba(0,212,255,0.08)" stroke-width="2"/>
-        <line x1="180" y1="301" x2="180" y2="339" stroke="rgba(0,212,255,0.06)" stroke-width="1.5"/>
-        <line x1="420" y1="301" x2="420" y2="339" stroke="rgba(0,212,255,0.06)" stroke-width="1.5"/>
+        <!-- South complex taxiway connectors -->
+        <line x1="310" y1="270" x2="310" y2="330" stroke="rgba(0,212,255,0.07)" stroke-width="2"/>
+        <line x1="200" y1="270" x2="200" y2="330" stroke="rgba(0,212,255,0.05)" stroke-width="1.5" stroke-dasharray="3 4"/>
+        <line x1="420" y1="270" x2="420" y2="330" stroke="rgba(0,212,255,0.05)" stroke-width="1.5" stroke-dasharray="3 4"/>
 
-        <!-- South terminal area suggestion -->
-        <rect x="200" y="365" width="200" height="16" rx="3"
-              fill="rgba(0,212,255,0.04)" stroke="rgba(0,212,255,0.08)" stroke-width="1"/>
-        <text x="300" y="377" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.25)">CDG 3 · S4</text>
+        <!-- T3/CDG3 terminal hint -->
+        <rect x="220" y="288" width="180" height="14" rx="3"
+              fill="rgba(0,212,255,0.03)" stroke="rgba(0,212,255,0.07)" stroke-width="1"/>
+        <text x="310" y="299" text-anchor="middle" font-family="Share Tech Mono,monospace"
+              font-size="8" fill="rgba(0,212,255,0.2)" letter-spacing="2">TERMINAL 1 · 3</text>
 
-        <!-- North/South separator label -->
-        <text x="300" y="270" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.15)" letter-spacing="3">· · · · · · · · · · · · ·</text>
+        <!-- Approach direction labels -->
+        <text x="8" y="230" text-anchor="middle" font-family="Share Tech Mono,monospace"
+              font-size="8" fill="rgba(0,212,255,0.2)" transform="rotate(-90,8,230)">08 APPROACH →</text>
+        <text x="612" y="230" text-anchor="middle" font-family="Share Tech Mono,monospace"
+              font-size="8" fill="rgba(0,212,255,0.2)" transform="rotate(90,612,230)">← 26/27 APPROACH</text>
 
-        <!-- Direction arrows (W side = 08x approaches, E side = 26x approaches) -->
-        <text x="18" y="250" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.2)" writing-mode="tb">08 APPR ▶</text>
-        <text x="585" y="270" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.2)" writing-mode="tb">◀ 26 APPR</text>
+        <!-- North arrow -->
+        <g transform="translate(590,30)">
+          <line x1="0" y1="12" x2="0" y2="-12" stroke="rgba(0,212,255,0.35)" stroke-width="1"/>
+          <polygon points="0,-12 -3,-4 3,-4" fill="rgba(0,212,255,0.5)"/>
+          <text x="0" y="22" text-anchor="middle" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="rgba(0,212,255,0.4)">N</text>
+        </g>
+
+        <!-- Aircraft layer — populated by JS -->
+        <g id="aircraftLayer"></g>
+
+        <!-- Scale -->
+        <g transform="translate(20,428)">
+          <line x1="0" y1="0" x2="54" y2="0" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
+          <line x1="0" y1="-3" x2="0" y2="3" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
+          <line x1="54" y1="-3" x2="54" y2="3" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
+          <text x="27" y="-5" text-anchor="middle" font-family="Share Tech Mono,monospace"
+                font-size="7" fill="rgba(0,212,255,0.35)">≈5km</text>
+        </g>
+
+        <!-- Legend -->
+        <g transform="translate(500,418)">
+          <rect x="0" y="-4" width="8" height="4" rx="1" fill="#00ff9d"/>
+          <text x="11" y="0" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,212,255,0.5)">ACTIVE RWY</text>
+        </g>
+        <g transform="translate(500,430)">
+          <circle cx="4" cy="-3" r="3" fill="#00ff9d"/>
+          <text x="11" y="0" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,212,255,0.5)">ON APPROACH</text>
+        </g>
+        <g transform="translate(500,442)">
+          <circle cx="4" cy="-3" r="3" fill="#00d4ff" opacity="0.6"/>
+          <text x="11" y="0" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,212,255,0.5)">OTHER TRAFFIC</text>
+        </g>
 
       </svg>
     </div>
@@ -680,7 +725,7 @@
 
   <!-- RIGHT BOTTOM: Aircraft List -->
   <div class="right-bottom">
-    <div class="panel-label">Approach Traffic · Within 5km</div>
+    <div class="panel-label">Approach Traffic · 15nm radius</div>
     <div id="aircraftList">
       <div class="empty-state">Waiting for data…</div>
     </div>
@@ -714,24 +759,25 @@
 const AIRPORT = {
   icao: 'LFPG',
   name: 'Paris Charles de Gaulle',
-  lat: 49.0128,
-  lon: 2.5500,
-  radius_km: 15,  // Extended to 15km to catch aircraft on final approach
-  // Each runway defined by:
-  //   heading: true magnetic heading to LAND on this runway
-  //   clat/clon: centerline midpoint (used for lateral offset)
-  //   lat/lon: landing threshold position
+  lat: 49.0090,
+  lon: 2.5541,
+  radius_km: 27.8, // 15 nm
+  // Correct LFPG runway layout per French AIP / OurAirports
+  // North-to-South order: 08L/26R · 09L/27R · 08R/26L · 09R/27L
+  // All headings 084° / 264° (magnetic ~082°)
   runways: [
-    // ── NORTH COMPLEX (09L outer / 09R inner) ──
-    { id: '09L', heading: 84,  oppHeading: 264, clat: 49.0294, clon: 2.5650, lat: 49.0280, lon: 2.5250 },
-    { id: '27R', heading: 264, oppHeading: 84,  clat: 49.0294, clon: 2.5650, lat: 49.0308, lon: 2.6050 },
-    { id: '09R', heading: 84,  oppHeading: 264, clat: 49.0224, clon: 2.5470, lat: 49.0210, lon: 2.5070 },
-    { id: '27L', heading: 264, oppHeading: 84,  clat: 49.0224, clon: 2.5470, lat: 49.0238, lon: 2.5870 },
-    // ── SOUTH COMPLEX (08R outer / 08L inner) ──
-    { id: '08R', heading: 84,  oppHeading: 264, clat: 49.0074, clon: 2.5445, lat: 49.0060, lon: 2.5100 },
-    { id: '26L', heading: 264, oppHeading: 84,  clat: 49.0074, clon: 2.5445, lat: 49.0088, lon: 2.5790 },
-    { id: '08L', heading: 84,  oppHeading: 264, clat: 49.0164, clon: 2.5350, lat: 49.0150, lon: 2.4950 },
-    { id: '26R', heading: 264, oppHeading: 84,  clat: 49.0164, clon: 2.5350, lat: 49.0178, lon: 2.5750 },
+    // North OUTER — 08L/26R — 4215m — long runway
+    { id: '08L', heading: 84,  lat: 49.0265, lon: 2.4710 },
+    { id: '26R', heading: 264, lat: 49.0292, lon: 2.5930 },
+    // North INNER — 09L/27R — 2700m — shorter runway
+    { id: '09L', heading: 84,  lat: 49.0160, lon: 2.5030 },
+    { id: '27R', heading: 264, lat: 49.0178, lon: 2.5680 },
+    // South INNER — 08R/26L — 2700m — shorter runway
+    { id: '08R', heading: 84,  lat: 49.0000, lon: 2.5040 },
+    { id: '26L', heading: 264, lat: 49.0018, lon: 2.5690 },
+    // South OUTER — 09R/27L — 4200m — long runway
+    { id: '09R', heading: 84,  lat: 48.9890, lon: 2.4720 },
+    { id: '27L', heading: 264, lat: 48.9916, lon: 2.5940 },
   ]
 };
 
@@ -797,7 +843,7 @@ function analyzeTraffic(states) {
   //  true_track, vertical_rate, sensors, geo_altitude, squawk, spi, position_source]
 
   const HEADING_TOLERANCE = 20; // degrees — tighter now that we use position too
-  const MAX_ALT_M = 3000;       // 3000m to catch longer finals (15km radius)
+  const MAX_ALT_M = 4500;       // 4500m (~15000ft) for 15nm final
   const MAX_LATERAL_KM = 0.8;   // must be within 800m of centerline
 
   const aircraft = states
@@ -1018,60 +1064,140 @@ function showError(msg) {
 }
 
 // ──────────────────────────────────────────────
-// SVG Runway Diagram Updater
+// SVG Runway Diagram — update active runways + draw aircraft
 // ──────────────────────────────────────────────
 
-// Map each runway ID to its SVG element IDs
+// SVG viewport dimensions and LFPG geographic bounds
+const SVG_W = 620, SVG_H = 460;
+// Geographic bounds of the SVG view (approx 30km wide, 20km tall)
+const SVG_BOUNDS = {
+  lonMin: 2.430, lonMax: 2.680,  // west to east
+  latMin: 48.970, latMax: 49.055  // south to north (note: SVG y flips)
+};
+
+function geoToSVG(lat, lon) {
+  const x = (lon - SVG_BOUNDS.lonMin) / (SVG_BOUNDS.lonMax - SVG_BOUNDS.lonMin) * SVG_W;
+  const y = (1 - (lat - SVG_BOUNDS.latMin) / (SVG_BOUNDS.latMax - SVG_BOUNDS.latMin)) * SVG_H;
+  return { x, y };
+}
+
+// Map runway IDs to their SVG element IDs
 const RWY_SVG = {
-  '08L': { pair: '08L_26R', labelId: 'lbl_08L' },
-  '26R': { pair: '08L_26R', labelId: 'lbl_26R' },
-  '08R': { pair: '08R_26L', labelId: 'lbl_08R' },
-  '26L': { pair: '08R_26L', labelId: 'lbl_26L' },
-  '09L': { pair: '09L_27R', labelId: 'lbl_09L' },
-  '27R': { pair: '09L_27R', labelId: 'lbl_27R' },
-  '09R': { pair: '09R_27L', labelId: 'lbl_09R' },
-  '27L': { pair: '09R_27L', labelId: 'lbl_27L' },
+  '08L': { stripId: 'strip_08L_26R', glowId: 'glow_08L_26R', lblId: 'lbl_08L' },
+  '26R': { stripId: 'strip_08L_26R', glowId: 'glow_08L_26R', lblId: 'lbl_26R' },
+  '09L': { stripId: 'strip_09L_27R', glowId: 'glow_09L_27R', lblId: 'lbl_09L' },
+  '27R': { stripId: 'strip_09L_27R', glowId: 'glow_09L_27R', lblId: 'lbl_27R' },
+  '08R': { stripId: 'strip_08R_26L', glowId: 'glow_08R_26L', lblId: 'lbl_08R' },
+  '26L': { stripId: 'strip_08R_26L', glowId: 'glow_08R_26L', lblId: 'lbl_26L' },
+  '09R': { stripId: 'strip_09R_27L', glowId: 'glow_09R_27L', lblId: 'lbl_09R' },
+  '27L': { stripId: 'strip_09R_27L', glowId: 'glow_09R_27L', lblId: 'lbl_27L' },
 };
 
 function updateDiagram() {
-  // Reset all runways to inactive
-  const allPairs = ['08L_26R', '08R_26L', '09L_27R', '09R_27L'];
-  allPairs.forEach(pair => {
+  // Reset all runways
+  ['08L_26R','09L_27R','08R_26L','09R_27L'].forEach(pair => {
     const strip = document.getElementById('strip_' + pair);
     const glow  = document.getElementById('glow_' + pair);
-    if (strip) strip.setAttribute('fill', '#0f2a1a');
-    if (strip) strip.setAttribute('stroke', '#1a3a2a');
-    if (glow)  glow.setAttribute('fill', 'rgba(0,255,157,0)');
+    if (strip) { strip.setAttribute('fill', '#0d1f10'); strip.setAttribute('stroke', '#1c3820'); }
+    if (glow)  { glow.setAttribute('fill', 'none'); glow.removeAttribute('filter'); }
+  });
+  ['08L','26R','09L','27R','08R','26L','09R','27L'].forEach(id => {
+    const el = document.getElementById('lbl_' + id);
+    if (el) { el.setAttribute('fill', '#1c4020'); el.setAttribute('font-size', '11'); }
   });
 
-  // Reset all labels
-  Object.values(RWY_SVG).forEach(({ labelId }) => {
-    const el = document.getElementById(labelId);
-    if (el) {
-      el.setAttribute('fill', '#1a4a3a');
-      el.setAttribute('font-size', '13');
-    }
-  });
-
-  // Highlight active runways
-  Object.entries(activeRunways).forEach(([rwyId, count]) => {
+  // Activate active runways
+  Object.entries(activeRunways).forEach(([rwyId]) => {
     const cfg = RWY_SVG[rwyId];
     if (!cfg) return;
+    const strip = document.getElementById(cfg.stripId);
+    const glow  = document.getElementById(cfg.glowId);
+    const lbl   = document.getElementById(cfg.lblId);
+    if (strip) { strip.setAttribute('fill', '#0a2a12'); strip.setAttribute('stroke', '#00ff9d'); }
+    if (glow)  { glow.setAttribute('fill', 'rgba(0,255,157,0.10)'); glow.setAttribute('filter', 'url(#glow-green)'); }
+    if (lbl)   { lbl.setAttribute('fill', '#00ff9d'); lbl.setAttribute('font-size', '12'); }
+  });
 
-    const strip = document.getElementById('strip_' + cfg.pair);
-    const glow  = document.getElementById('glow_' + cfg.pair);
-    const lbl   = document.getElementById(cfg.labelId);
+  // Draw aircraft on diagram
+  drawAircraftOnDiagram();
+}
 
-    if (strip) {
-      strip.setAttribute('fill', '#0a2a15');
-      strip.setAttribute('stroke', '#00ff9d');
+function drawAircraftOnDiagram() {
+  const layer = document.getElementById('aircraftLayer');
+  if (!layer) return;
+  layer.innerHTML = '';
+
+  const ns = 'http://www.w3.org/2000/svg';
+
+  allAircraft.forEach(ac => {
+    const pos = geoToSVG(ac.lat, ac.lon);
+    // Skip if outside SVG bounds
+    if (pos.x < 0 || pos.x > SVG_W || pos.y < 0 || pos.y > SVG_H) return;
+
+    const isApproach = approachAircraft.find(x => x.icao === ac.icao);
+    const color = isApproach ? '#00ff9d' : '#00d4ff';
+    const r = isApproach ? 4 : 3;
+
+    // Heading trail
+    if (ac.heading != null) {
+      const hdgRad = (ac.heading - 90) * Math.PI / 180;
+      const trailLen = isApproach ? 22 : 14;
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', pos.x);
+      line.setAttribute('y1', pos.y);
+      line.setAttribute('x2', pos.x - Math.cos(hdgRad) * trailLen);
+      line.setAttribute('y2', pos.y - Math.sin(hdgRad) * trailLen);
+      line.setAttribute('stroke', isApproach ? 'rgba(0,255,157,0.5)' : 'rgba(0,212,255,0.3)');
+      line.setAttribute('stroke-width', '1.5');
+      layer.appendChild(line);
     }
-    if (glow) {
-      glow.setAttribute('fill', 'rgba(0,255,157,0.12)');
+
+    // Glow ring for approach aircraft
+    if (isApproach) {
+      const ring = document.createElementNS(ns, 'circle');
+      ring.setAttribute('cx', pos.x);
+      ring.setAttribute('cy', pos.y);
+      ring.setAttribute('r', 7);
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', '#00ff9d');
+      ring.setAttribute('stroke-width', '1');
+      ring.setAttribute('opacity', '0.3');
+      ring.setAttribute('filter', 'url(#glow-green)');
+      layer.appendChild(ring);
     }
-    if (lbl) {
-      lbl.setAttribute('fill', '#00ff9d');
-      lbl.setAttribute('font-size', '14');
+
+    // Aircraft dot
+    const dot = document.createElementNS(ns, 'circle');
+    dot.setAttribute('cx', pos.x);
+    dot.setAttribute('cy', pos.y);
+    dot.setAttribute('r', r);
+    dot.setAttribute('fill', color);
+    if (isApproach) dot.setAttribute('filter', 'url(#glow-green)');
+    layer.appendChild(dot);
+
+    // Callsign label (only for approach aircraft to keep it clean)
+    if (isApproach) {
+      const txt = document.createElementNS(ns, 'text');
+      txt.setAttribute('x', pos.x + 7);
+      txt.setAttribute('y', pos.y - 5);
+      txt.setAttribute('font-family', 'Share Tech Mono,monospace');
+      txt.setAttribute('font-size', '8');
+      txt.setAttribute('fill', '#00ff9d');
+      txt.setAttribute('opacity', '0.9');
+      txt.textContent = ac.callsign.substring(0, 8);
+      layer.appendChild(txt);
+
+      // Altitude tag
+      if (ac.alt_m != null) {
+        const alt = document.createElementNS(ns, 'text');
+        alt.setAttribute('x', pos.x + 7);
+        alt.setAttribute('y', pos.y + 5);
+        alt.setAttribute('font-family', 'Share Tech Mono,monospace');
+        alt.setAttribute('font-size', '7');
+        alt.setAttribute('fill', 'rgba(0,255,157,0.6)');
+        alt.textContent = Math.round(ac.alt_m) + 'm';
+        layer.appendChild(alt);
+      }
     }
   });
 }
@@ -1079,6 +1205,8 @@ function updateDiagram() {
 function drawRadar() {
   updateDiagram();
 }
+
+
 
 // ──────────────────────────────────────────────
 // Auto-refresh every 15 seconds
