@@ -65,7 +65,7 @@ const server = http.createServer((req, res) => {
 
   // ── Static files from /public ──
   let filePath = parsed.pathname === '/' ? '/index.html' : parsed.pathname;
-  filePath = path.join(__dirname, 'public', filePath);
+  filePath = path.join(__dirname, filePath);
 
   fs.readFile(filePath, (err, content) => {
     if (err) {
