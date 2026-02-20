@@ -529,11 +529,11 @@
     <div class="diagram-container">
       <svg id="rwyDiagram" viewBox="0 0 640 500" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <filter id="glow-green" x="-60%" y="-60%" width="220%" height="220%">
+          <filter id="glow-green" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation="3" result="b"/>
             <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
-          <filter id="glow-blue" x="-60%" y="-60%" width="220%" height="220%">
+          <filter id="glow-blue" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation="2" result="b"/>
             <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
@@ -541,185 +541,167 @@
 
         <rect width="640" height="500" fill="#050a0e"/>
 
-        <!--
-          LFPG CORRECT LAYOUT — N (top) to S (bottom)
-          All headings 084°/264°   West=08x/09x  East=26x/27x
+        <!-- ═══════════════════════════════════════════════
+             GEO-ACCURATE layout — 25px/km — center=(320,260)
+             Airport center: LFPG 49.0097°N 2.5541°E
 
-          NORTH COMPLEX
-            y=105  09L / 27R  outer  2700m  (northernmost — lat 49°01.48')
-            y=175  09R / 27L  inner  4200m  (lat 49°01.24')
+             NORTH COMPLEX
+               09L/27R  (266,218)→(334,213)   outer, 2700m, 45m wide
+               09R/27L  (245,230)→(335,222)   inner, 4200m, 60m wide
 
-          SOUTH COMPLEX
-            y=315  08L / 26R  inner  4142m  (lat 48°59.74')
-            y=385  08R / 26L  outer  2700m  (southernmost — lat 48°59.57')
-        -->
+             SOUTH COMPLEX
+               08L/26R  (318,299)→(407,292)   inner, 4142m, 60m wide
+               08R/26L  (341,307)→(408,301)   outer, 2700m, 45m wide
 
-        <!-- ═══ NORTH COMPLEX ═══ -->
-        <text x="320" y="68" text-anchor="middle" font-family="Orbitron,sans-serif"
-              font-size="9" letter-spacing="5" fill="rgba(0,212,255,0.2)">NORTH COMPLEX</text>
+             Extended centrelines drawn 80px beyond each threshold
+        ═══════════════════════════════════════════════ -->
 
-        <!-- ROW 1 — 09L/27R — north outer — 2700m (shorter) -->
+        <!-- Range rings — geo accurate -->
+        <!-- 5nm = 9.26km = 231px, but at 25px/km = 231px radius — clips SVG. Use 4nm=185px, 7nm=324px -->
+        <circle cx="320" cy="260" r="185" fill="none" stroke="rgba(0,212,255,0.07)" stroke-width="1" stroke-dasharray="4 7"/>
+        <circle cx="320" cy="260" r="324" fill="none" stroke="rgba(0,212,255,0.04)" stroke-width="1" stroke-dasharray="2 8"/>
+        <text x="320" y="75" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(0,212,255,0.18)">7nm</text>
+        <text x="320" y="138" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(0,212,255,0.18)">4nm</text>
+
+        <!-- Extended centrelines (ILS approach guides) -->
+        <!-- 09x approaches from west: extend left beyond thresholds -->
+        <line x1="100" y1="221" x2="267" y2="218" stroke="rgba(0,212,255,0.08)" stroke-width="1" stroke-dasharray="6 5"/>
+        <line x1="100" y1="232" x2="245" y2="230" stroke="rgba(0,212,255,0.06)" stroke-width="1" stroke-dasharray="6 5"/>
+        <!-- 27x/26x approaches from east: extend right beyond thresholds -->
+        <line x1="334" y1="213" x2="520" y2="208" stroke="rgba(0,212,255,0.08)" stroke-width="1" stroke-dasharray="6 5"/>
+        <line x1="335" y1="222" x2="520" y2="217" stroke="rgba(0,212,255,0.06)" stroke-width="1" stroke-dasharray="6 5"/>
+        <line x1="407" y1="292" x2="540" y2="286" stroke="rgba(0,212,255,0.08)" stroke-width="1" stroke-dasharray="6 5"/>
+        <line x1="408" y1="301" x2="540" y2="296" stroke="rgba(0,212,255,0.06)" stroke-width="1" stroke-dasharray="6 5"/>
+        <!-- 08x approaches from west -->
+        <line x1="140" y1="302" x2="318" y2="299" stroke="rgba(0,212,255,0.08)" stroke-width="1" stroke-dasharray="6 5"/>
+        <line x1="140" y1="310" x2="341" y2="307" stroke="rgba(0,212,255,0.06)" stroke-width="1" stroke-dasharray="6 5"/>
+
+        <!-- ── NORTH COMPLEX ── -->
+
+        <!-- 09L/27R — outer north — 2700m — 45m wide (5px stroke) -->
         <g id="rwy_09L_27R">
-          <rect id="glow_09L_27R" x="152" y="97"  width="336" height="16" rx="2" fill="none"/>
-          <rect id="strip_09L_27R" x="152" y="99"  width="336" height="12" rx="1"
-                fill="#0d1f10" stroke="#1c3820" stroke-width="1"/>
-          <line x1="170" y1="105" x2="470" y2="105"
-                stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="20 12"/>
-          <rect x="152" y="99" width="7" height="12" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <rect x="481" y="99" width="7" height="12" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <text id="lbl_09L" x="140" y="108" text-anchor="end"
-                font-family="Orbitron,sans-serif" font-size="12" font-weight="700" fill="#1c4020">09L</text>
-          <text x="140" y="120" text-anchor="end"
-                font-family="Share Tech Mono,monospace" font-size="8" fill="#0f2a14">084°</text>
-          <text id="lbl_27R" x="500" y="108" text-anchor="start"
-                font-family="Orbitron,sans-serif" font-size="12" font-weight="700" fill="#1c4020">27R</text>
-          <text x="500" y="120" text-anchor="start"
-                font-family="Share Tech Mono,monospace" font-size="8" fill="#0f2a14">264°</text>
-          <text x="320" y="95" text-anchor="middle"
-                font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,212,255,0.15)">2700m</text>
+          <!-- active glow layer -->
+          <line id="glow_09L_27R" x1="267" y1="218" x2="334" y2="213"
+                stroke="none" stroke-width="14" stroke-linecap="round"/>
+          <!-- runway surface -->
+          <line id="strip_09L_27R" x1="267" y1="218" x2="334" y2="213"
+                stroke="#0f2814" stroke-width="5" stroke-linecap="square"/>
+          <!-- centre line -->
+          <line x1="270" y1="218" x2="331" y2="213"
+                stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="8 6"/>
+          <!-- threshold bars -->
+          <line x1="267" y1="215" x2="267" y2="221" stroke="rgba(0,212,255,0.35)" stroke-width="2"/>
+          <line x1="334" y1="210" x2="334" y2="216" stroke="rgba(0,212,255,0.35)" stroke-width="2"/>
+          <!-- labels -->
+          <text id="lbl_09L" x="256" y="222" text-anchor="end" font-family="Orbitron,sans-serif"
+                font-size="9" font-weight="700" fill="#1a4020">09L</text>
+          <text id="lbl_27R" x="345" y="216" text-anchor="start" font-family="Orbitron,sans-serif"
+                font-size="9" font-weight="700" fill="#1a4020">27R</text>
         </g>
 
-        <!-- ROW 2 — 09R/27L — north inner — 4200m (longer) -->
+        <!-- 09R/27L — inner north — 4200m — 60m wide (7px stroke) -->
         <g id="rwy_09R_27L">
-          <rect id="glow_09R_27L" x="36"  y="167" width="568" height="16" rx="2" fill="none"/>
-          <rect id="strip_09R_27L" x="36"  y="169" width="568" height="12" rx="1"
-                fill="#0d1f10" stroke="#1c3820" stroke-width="1"/>
-          <line x1="56" y1="175" x2="584" y2="175"
-                stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="20 12"/>
-          <rect x="36"  y="169" width="7" height="12" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <rect x="597" y="169" width="7" height="12" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <!-- displaced thr 27L 1969ft -->
-          <rect x="557" y="169" width="3" height="12" fill="rgba(255,200,0,0.5)"/>
-          <text id="lbl_09R" x="26" y="178" text-anchor="end"
-                font-family="Orbitron,sans-serif" font-size="12" font-weight="700" fill="#1c4020">09R</text>
-          <text x="26" y="190" text-anchor="end"
-                font-family="Share Tech Mono,monospace" font-size="8" fill="#0f2a14">084°</text>
-          <text id="lbl_27L" x="616" y="178" text-anchor="start"
-                font-family="Orbitron,sans-serif" font-size="12" font-weight="700" fill="#1c4020">27L</text>
-          <text x="616" y="190" text-anchor="start"
-                font-family="Share Tech Mono,monospace" font-size="8" fill="#0f2a14">264°</text>
-          <text x="320" y="165" text-anchor="middle"
-                font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,212,255,0.15)">4200m</text>
+          <line id="glow_09R_27L" x1="245" y1="230" x2="335" y2="222"
+                stroke="none" stroke-width="18" stroke-linecap="round"/>
+          <line id="strip_09R_27L" x1="245" y1="230" x2="335" y2="222"
+                stroke="#0f2814" stroke-width="7" stroke-linecap="square"/>
+          <line x1="249" y1="229" x2="331" y2="222"
+                stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="8 6"/>
+          <line x1="245" y1="226" x2="245" y2="233" stroke="rgba(0,212,255,0.35)" stroke-width="2"/>
+          <line x1="335" y1="218" x2="335" y2="226" stroke="rgba(0,212,255,0.35)" stroke-width="2"/>
+          <!-- displaced threshold 27L -->
+          <line x1="322" y1="220" x2="322" y2="227" stroke="rgba(255,200,0,0.5)" stroke-width="2"/>
+          <text id="lbl_09R" x="234" y="233" text-anchor="end" font-family="Orbitron,sans-serif"
+                font-size="9" font-weight="700" fill="#1a4020">09R</text>
+          <text id="lbl_27L" x="346" y="225" text-anchor="start" font-family="Orbitron,sans-serif"
+                font-size="9" font-weight="700" fill="#1a4020">27L</text>
         </g>
 
-        <!-- North taxiway connectors -->
-        <line x1="320" y1="111" x2="320" y2="169" stroke="rgba(0,212,255,0.07)" stroke-width="2"/>
-        <line x1="220" y1="111" x2="220" y2="169" stroke="rgba(0,212,255,0.04)" stroke-width="1" stroke-dasharray="3 5"/>
-        <line x1="420" y1="111" x2="420" y2="169" stroke="rgba(0,212,255,0.04)" stroke-width="1" stroke-dasharray="3 5"/>
+        <!-- North complex label -->
+        <text x="200" y="208" text-anchor="middle" font-family="Share Tech Mono,monospace"
+              font-size="7" fill="rgba(0,212,255,0.2)" letter-spacing="2">N COMPLEX</text>
 
-        <!-- Terminal 2 -->
-        <rect x="215" y="200" width="210" height="16" rx="3"
-              fill="rgba(0,212,255,0.03)" stroke="rgba(0,212,255,0.06)" stroke-width="1"/>
-        <text x="320" y="212" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.2)" letter-spacing="2">TERMINAL 2</text>
+        <!-- ── SOUTH COMPLEX ── -->
 
-        <!-- ═══ APRON SEPARATION ═══ -->
-        <line x1="30" y1="256" x2="610" y2="256"
-              stroke="rgba(0,212,255,0.05)" stroke-width="1" stroke-dasharray="4 10"/>
-        <text x="320" y="264" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="7" fill="rgba(0,212,255,0.1)" letter-spacing="4">·  ·  ·  APRON  ·  ·  ·</text>
-
-        <!-- ═══ SOUTH COMPLEX ═══ -->
-        <text x="320" y="286" text-anchor="middle" font-family="Orbitron,sans-serif"
-              font-size="9" letter-spacing="5" fill="rgba(0,212,255,0.2)">SOUTH COMPLEX</text>
-
-        <!-- ROW 3 — 08L/26R — south inner — 4142m (longer) -->
+        <!-- 08L/26R — inner south — 4142m — 60m wide (7px stroke) -->
         <g id="rwy_08L_26R">
-          <rect id="glow_08L_26R" x="36"  y="297" width="568" height="16" rx="2" fill="none"/>
-          <rect id="strip_08L_26R" x="36"  y="299" width="568" height="12" rx="1"
-                fill="#0d1f10" stroke="#1c3820" stroke-width="1"/>
-          <line x1="56" y1="305" x2="584" y2="305"
-                stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="20 12"/>
-          <rect x="36"  y="299" width="7" height="12" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <rect x="597" y="299" width="7" height="12" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <!-- displaced thr 26R 1726ft -->
-          <rect x="557" y="299" width="3" height="12" fill="rgba(255,200,0,0.5)"/>
-          <text id="lbl_08L" x="26" y="308" text-anchor="end"
-                font-family="Orbitron,sans-serif" font-size="12" font-weight="700" fill="#1c4020">08L</text>
-          <text x="26" y="320" text-anchor="end"
-                font-family="Share Tech Mono,monospace" font-size="8" fill="#0f2a14">084°</text>
-          <text id="lbl_26R" x="616" y="308" text-anchor="start"
-                font-family="Orbitron,sans-serif" font-size="12" font-weight="700" fill="#1c4020">26R</text>
-          <text x="616" y="320" text-anchor="start"
-                font-family="Share Tech Mono,monospace" font-size="8" fill="#0f2a14">264°</text>
-          <text x="320" y="295" text-anchor="middle"
-                font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,212,255,0.15)">4142m</text>
+          <line id="glow_08L_26R" x1="318" y1="299" x2="407" y2="292"
+                stroke="none" stroke-width="18" stroke-linecap="round"/>
+          <line id="strip_08L_26R" x1="318" y1="299" x2="407" y2="292"
+                stroke="#0f2814" stroke-width="7" stroke-linecap="square"/>
+          <line x1="322" y1="298" x2="403" y2="292"
+                stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="8 6"/>
+          <line x1="318" y1="295" x2="318" y2="302" stroke="rgba(0,212,255,0.35)" stroke-width="2"/>
+          <line x1="407" y1="288" x2="407" y2="296" stroke="rgba(0,212,255,0.35)" stroke-width="2"/>
+          <!-- displaced threshold 26R -->
+          <line x1="394" y1="289" x2="394" y2="296" stroke="rgba(255,200,0,0.5)" stroke-width="2"/>
+          <text id="lbl_08L" x="307" y="302" text-anchor="end" font-family="Orbitron,sans-serif"
+                font-size="9" font-weight="700" fill="#1a4020">08L</text>
+          <text id="lbl_26R" x="418" y="295" text-anchor="start" font-family="Orbitron,sans-serif"
+                font-size="9" font-weight="700" fill="#1a4020">26R</text>
         </g>
 
-        <!-- ROW 4 — 08R/26L — south outer — 2700m (shorter, southernmost) -->
+        <!-- 08R/26L — outer south — 2700m — 45m wide (5px stroke) -->
         <g id="rwy_08R_26L">
-          <rect id="glow_08R_26L" x="152" y="377" width="336" height="16" rx="2" fill="none"/>
-          <rect id="strip_08R_26L" x="152" y="379" width="336" height="12" rx="1"
-                fill="#0d1f10" stroke="#1c3820" stroke-width="1"/>
-          <line x1="170" y1="385" x2="470" y2="385"
-                stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="20 12"/>
-          <rect x="152" y="379" width="7" height="12" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <rect x="481" y="379" width="7" height="12" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <text id="lbl_08R" x="140" y="388" text-anchor="end"
-                font-family="Orbitron,sans-serif" font-size="12" font-weight="700" fill="#1c4020">08R</text>
-          <text x="140" y="400" text-anchor="end"
-                font-family="Share Tech Mono,monospace" font-size="8" fill="#0f2a14">084°</text>
-          <text id="lbl_26L" x="500" y="388" text-anchor="start"
-                font-family="Orbitron,sans-serif" font-size="12" font-weight="700" fill="#1c4020">26L</text>
-          <text x="500" y="400" text-anchor="start"
-                font-family="Share Tech Mono,monospace" font-size="8" fill="#0f2a14">264°</text>
-          <text x="320" y="375" text-anchor="middle"
-                font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,212,255,0.15)">2700m</text>
+          <line id="glow_08R_26L" x1="341" y1="307" x2="408" y2="301"
+                stroke="none" stroke-width="14" stroke-linecap="round"/>
+          <line id="strip_08R_26L" x1="341" y1="307" x2="408" y2="301"
+                stroke="#0f2814" stroke-width="5" stroke-linecap="square"/>
+          <line x1="344" y1="306" x2="405" y2="300"
+                stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="8 6"/>
+          <line x1="341" y1="303" x2="341" y2="310" stroke="rgba(0,212,255,0.35)" stroke-width="2"/>
+          <line x1="408" y1="297" x2="408" y2="305" stroke="rgba(0,212,255,0.35)" stroke-width="2"/>
+          <text id="lbl_08R" x="330" y="311" text-anchor="end" font-family="Orbitron,sans-serif"
+                font-size="9" font-weight="700" fill="#1a4020">08R</text>
+          <text id="lbl_26L" x="419" y="305" text-anchor="start" font-family="Orbitron,sans-serif"
+                font-size="9" font-weight="700" fill="#1a4020">26L</text>
         </g>
 
-        <!-- South taxiway connectors -->
-        <line x1="320" y1="311" x2="320" y2="379" stroke="rgba(0,212,255,0.07)" stroke-width="2"/>
-        <line x1="220" y1="311" x2="220" y2="379" stroke="rgba(0,212,255,0.04)" stroke-width="1" stroke-dasharray="3 5"/>
-        <line x1="420" y1="311" x2="420" y2="379" stroke="rgba(0,212,255,0.04)" stroke-width="1" stroke-dasharray="3 5"/>
+        <!-- South complex label -->
+        <text x="460" y="308" text-anchor="middle" font-family="Share Tech Mono,monospace"
+              font-size="7" fill="rgba(0,212,255,0.2)" letter-spacing="2">S COMPLEX</text>
 
-        <!-- Terminal 1 / 3 -->
-        <rect x="215" y="408" width="210" height="16" rx="3"
-              fill="rgba(0,212,255,0.03)" stroke="rgba(0,212,255,0.06)" stroke-width="1"/>
-        <text x="320" y="420" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.2)" letter-spacing="2">TERMINAL 1 · 3</text>
-
-        <!-- Approach direction labels -->
-        <text x="8" y="245" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.18)" transform="rotate(-90,8,245)">← 08/09  084°</text>
-        <text x="632" y="245" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="8" fill="rgba(0,212,255,0.18)" transform="rotate(90,632,245)">26/27  264° →</text>
+        <!-- Airport centre cross -->
+        <line x1="316" y1="260" x2="324" y2="260" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
+        <line x1="320" y1="256" x2="320" y2="264" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
+        <circle cx="320" cy="260" r="2" fill="rgba(0,212,255,0.3)"/>
 
         <!-- North arrow -->
-        <g transform="translate(610,38)">
-          <line x1="0" y1="14" x2="0" y2="-14" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
-          <polygon points="0,-14 -4,-4 4,-4" fill="rgba(0,212,255,0.6)"/>
-          <text x="0" y="26" text-anchor="middle" font-family="Share Tech Mono,monospace"
-                font-size="9" fill="rgba(0,212,255,0.5)">N</text>
+        <g transform="translate(610,30)">
+          <line x1="0" y1="12" x2="0" y2="-12" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
+          <polygon points="0,-12 -3,-4 3,-4" fill="rgba(0,212,255,0.6)"/>
+          <text x="0" y="22" text-anchor="middle" font-family="Share Tech Mono,monospace"
+                font-size="8" fill="rgba(0,212,255,0.5)">N</text>
         </g>
 
-        <!-- Scale -->
-        <g transform="translate(20,478)">
-          <line x1="0" y1="0" x2="54" y2="0" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+        <!-- Scale bar: 50px = 2km at 25px/km -->
+        <g transform="translate(20,476)">
+          <line x1="0" y1="0" x2="50" y2="0" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
           <line x1="0" y1="-3" x2="0" y2="3" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="54" y1="-3" x2="54" y2="3" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <text x="27" y="-5" text-anchor="middle" font-family="Share Tech Mono,monospace"
-                font-size="7" fill="rgba(0,212,255,0.4)">≈3km</text>
+          <line x1="50" y1="-3" x2="50" y2="3" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <text x="25" y="-5" text-anchor="middle" font-family="Share Tech Mono,monospace"
+                font-size="7" fill="rgba(0,212,255,0.4)">2km</text>
         </g>
 
-        <!-- Displaced threshold legend -->
-        <g transform="translate(400,478)">
-          <rect x="0" y="-5" width="4" height="9" fill="rgba(255,200,0,0.5)"/>
-          <text x="8" y="0" font-family="Share Tech Mono,monospace" font-size="7"
-                fill="rgba(255,200,0,0.5)">DISPLACED THR</text>
+        <!-- LFPG label -->
+        <text x="320" y="22" text-anchor="middle" font-family="Orbitron,sans-serif"
+              font-size="10" letter-spacing="4" fill="rgba(0,212,255,0.3)">LFPG · CDG</text>
+
+        <!-- Legend -->
+        <g transform="translate(510,470)">
+          <circle cx="4" cy="-3" r="3" fill="#00ff9d"/>
+          <text x="10" y="0" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,255,157,0.6)">APPROACH</text>
+        </g>
+        <g transform="translate(510,482)">
+          <circle cx="4" cy="-3" r="3" fill="rgba(0,212,255,0.7)"/>
+          <text x="10" y="0" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(0,212,255,0.5)">TRAFFIC</text>
+        </g>
+        <g transform="translate(390,482)">
+          <line x1="0" y1="-3" x2="8" y2="-3" stroke="rgba(255,200,0,0.5)" stroke-width="2"/>
+          <text x="12" y="0" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(255,200,0,0.5)">DISPLACED THR</text>
         </g>
 
-        <!-- Range rings (geo-accurate, centered on airport) -->
-        <!-- 5nm = 9.26km = 148px, 10nm = 18.52km = 296px at 16px/km -->
-        <circle cx="320" cy="250" r="148" fill="none" stroke="rgba(0,212,255,0.06)" stroke-width="1" stroke-dasharray="4 6"/>
-        <circle cx="320" cy="250" r="296" fill="none" stroke="rgba(0,212,255,0.04)" stroke-width="1" stroke-dasharray="4 8"/>
-        <text x="320" y="102" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="7" fill="rgba(0,212,255,0.15)">10nm</text>
-        <text x="320" y="176" text-anchor="middle" font-family="Share Tech Mono,monospace"
-              font-size="7" fill="rgba(0,212,255,0.15)">5nm</text>
-        <!-- Airport center cross -->
-        <line x1="316" y1="250" x2="324" y2="250" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-        <line x1="320" y1="246" x2="320" y2="254" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-        <!-- Aircraft layer populated by JS -->
+        <!-- Aircraft layer — populated by JS -->
         <g id="aircraftLayer"></g>
 
       </svg>
@@ -1086,11 +1068,11 @@ const SVG_W = 640, SVG_H = 500;
 // The runway diagram is schematic (not geo-scaled) — drawn at fixed positions for readability.
 // Aircraft layer uses a separate scale: 16px per km, centered at (320, 250) = airport center.
 // This shows a ~10nm radius around LFPG, covering short/medium finals.
-const AC_PX_PER_KM = 16;
+const AC_PX_PER_KM = 25;  // 25px per km — matches geo-accurate runway drawing
 const SVG_CX = 320;
-const SVG_CY = 250;
+const SVG_CY = 260;        // shifted slightly south to centre the airport
 const AC_LAT_KM = 111.0;
-const AC_LON_KM = 111.0 * Math.cos(49.0097 * Math.PI / 180); // ~72.9 km/deg at 49°N
+const AC_LON_KM = 111.0 * Math.cos(AIRPORT.lat * Math.PI / 180); // ~72.8 km/deg at 49°N
 
 function geoToSVG(lat, lon) {
   const dx = (lon - AIRPORT.lon) * AC_LON_KM * AC_PX_PER_KM;
@@ -1120,12 +1102,12 @@ function updateDiagram() {
   ['09L_27R','09R_27L','08L_26R','08R_26L'].forEach(pair => {
     const strip = document.getElementById('strip_' + pair);
     const glow  = document.getElementById('glow_' + pair);
-    if (strip) { strip.setAttribute('fill', '#0d1f10'); strip.setAttribute('stroke', '#1c3820'); }
-    if (glow)  { glow.setAttribute('fill', 'none'); glow.removeAttribute('filter'); }
+    if (strip) { strip.setAttribute('stroke', '#0f2814'); }
+    if (glow)  { glow.setAttribute('stroke', 'none'); glow.removeAttribute('filter'); }
   });
   ['08L','26R','09L','27R','08R','26L','09R','27L'].forEach(id => {
     const el = document.getElementById('lbl_' + id);
-    if (el) { el.setAttribute('fill', '#1c4020'); el.setAttribute('font-size', '11'); }
+    if (el) { el.setAttribute('fill', '#1a4020'); el.setAttribute('font-size', '9'); }
   });
 
   // Activate active runways
@@ -1135,9 +1117,9 @@ function updateDiagram() {
     const strip = document.getElementById(cfg.stripId);
     const glow  = document.getElementById(cfg.glowId);
     const lbl   = document.getElementById(cfg.lblId);
-    if (strip) { strip.setAttribute('fill', '#0a2a12'); strip.setAttribute('stroke', '#00ff9d'); }
-    if (glow)  { glow.setAttribute('fill', 'rgba(0,255,157,0.10)'); glow.setAttribute('filter', 'url(#glow-green)'); }
-    if (lbl)   { lbl.setAttribute('fill', '#00ff9d'); lbl.setAttribute('font-size', '12'); }
+    if (strip) { strip.setAttribute('stroke', '#00ff9d'); }
+    if (glow)  { glow.setAttribute('stroke', 'rgba(0,255,157,0.25)'); glow.setAttribute('filter', 'url(#glow-green)'); }
+    if (lbl)   { lbl.setAttribute('fill', '#00ff9d'); lbl.setAttribute('font-size', '10'); }
   });
 
   // Draw aircraft on diagram
